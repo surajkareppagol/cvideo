@@ -1,7 +1,7 @@
 @ metadata
 
 = name: Circles and rectangles
-= background: #121212
+= background: #c17261
 = width: 1280
 = height: 720
 
@@ -10,8 +10,20 @@
 @@ 00:00:00 - 00:00:05
 
 = animation: top-to-bottom
+= speed: 4
 > item: shape
   + shape: circle
   + cx: 600
   + cy: 12
   + radius: 400
+
+@@ 00:00:06 - 00:00:10
+
+= animation: top-to-bottom
+= speed: 6
+> item: shape
+  + shape: rectangle
+  + x: 600
+  + y: 12
+  + width: 400
+  + height: 200
