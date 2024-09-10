@@ -1,5 +1,3 @@
-import cairosvg
-
 class SVG:
     def __init__(self, width=1080, height=1920):
         self.svg_boilerplate = f"""
@@ -49,7 +47,3 @@ class SVG:
         element += "/> "
 
         self.elements.append(element)
-
-    def convert(self, png_output="output.png", format="png"):
-      with open(self.svg_output, "r") as file:
-        cairosvg.svg2png(file_obj=file, write_to=f"{png_output}")
