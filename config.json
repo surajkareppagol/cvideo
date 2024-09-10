@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "name": "Circles and rectangles",
+    "background": "#121212",
+    "width": "1280",
+    "height": "720"
+  },
+  "timeline": [
+    {
+      "time_start": "00:00:00",
+      "time_end": "00:00:05",
+      "animation": "top-to-bottom",
+      "item": {
+        "name": "shape",
+        "shape": "circle",
+        "cx": "600",
+        "cy": "12",
+        "radius": "400"
+      }
+    }
+  ]
+}
