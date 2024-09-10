@@ -7,7 +7,7 @@ class Convert:
         pass
 
     def image_to_video(
-        self, output="output", source_dir=None, image_format="png", video_format="mkv"
+        self, output="output", source_dir=None, image_format="svg", video_format="mkv"
     ):
         if source_dir is None:
             print("Convert: Source directory not found.")
@@ -17,5 +17,5 @@ class Convert:
         video_output = f"{output}.{video_format}"
 
         ffmpeg.input(image_glob, pattern_type="glob", framerate=30).output(
-            video_output
+            video_output, loglevel="quiet"
         ).run(overwrite_output=True)
