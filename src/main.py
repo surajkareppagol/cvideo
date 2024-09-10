@@ -1,5 +1,5 @@
-from svg.svg import SVG
-from convert.convert import Convert
+from svg import SVG
+from convert import Convert
 
 from rich.console import Console
 from rich.panel import Panel
@@ -10,13 +10,14 @@ from sys import argv
 import time
 import os
 
-from config.config import Config
+from config import Config
 
 term = Console()
 convert = Convert()
 svg = SVG()
 
 current_time = 0
+frame_count = 0
 
 
 def calculate_frames(time_end, frame_rate=30):
@@ -35,7 +36,13 @@ def calculate_frames(time_end, frame_rate=30):
     return frames
 
 
-def create_svg(video_data, frames):
+def create_svg(video_data, frames, animation_speed=2):
+    global frame_count
+
+    animation_speed = int(video_data["speed"])
+
+    movement_multiplier = 1
+
     shape_data = video_data["item"]
 
     shape = shape_data["shape"]
@@ -43,15 +50,26 @@ def create_svg(video_data, frames):
     if not os.path.exists("svvgb_svg"):
         os.mkdir("svvgb_svg")
 
-    for i in range(1, frames):
+    for i in range(frame_count, frame_count + frames):
         if shape == "circle":
             cx = shape_data["cx"]
             cy = shape_data["cy"]
             radius = shape_data["radius"]
 
-            svg.circle(cx, int(cy) * i, radius, "#fff", "#fff")
+            svg.circle(cx, int(cy) * movement_multiplier, radius, "#c17261", "#fff")
+            movement_multiplier += animation_speed
+        elif shape == "rectangle":
+            x = shape_data["x"]
+            y = shape_data["y"]
+            width = shape_data["width"]
+            height = shape_data["height"]
+
+            svg.rectangle(x, int(y) + movement_multiplier, width, height, fill="#fff")
+            movement_multiplier += animation_speed
 
         svg.create(svg_output=f"svvgb_svg/{i:04}.svg")
+
+    frame_count += frames
 
 
 def create_video():
@@ -71,14 +89,19 @@ def main():
     metadata = config["metadata"]
     timeline = config["timeline"]
 
+    page_width = metadata["width"]
+    page_height = metadata["height"]
+
+    svg.set_page_size(page_width, page_height)
+
     for time_slot in timeline:
         frames = calculate_frames(time_slot["time_end"])
         create_svg(time_slot, frames)
 
-        with term.status("⚙️  Creating Video", spinner="arc"):
-            create_video()
+    with term.status("⚙️  Creating Video", spinner="arc"):
+        create_video()
 
-        term.print("🚀 Video has been created.")
+    term.print("🚀 Video has been created.")
 
 
 if __name__ == "__main__":
