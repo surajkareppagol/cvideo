@@ -1,22 +1,4 @@
-# @ metadata
-
-# = name: Circles and rectangles
-# = background: #121212
-# = width: 1280
-# = height: 720
-
-# @ timeline
-
-# @@ 00:00:00 - 00:05:00
-
-# = animation: top-to-bottom
-# = item: shape
-#   + shape: circle
-#   + cx: 10
-#   + cy: 10
-#   + radius: 40
-
-import json
+from json import dumps
 
 
 class Config:
@@ -100,5 +82,5 @@ class Config:
                     self.add_tokens(prop, value)
 
         with open("config.json", "w") as file:
-            file.write(json.dumps(self.config))
+            file.write(dumps(self.config))
         return self.config
