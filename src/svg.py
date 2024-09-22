@@ -1,93 +1,51 @@
-class SVG:
-    def __init__(self):
-        self.width = 1080
-        self.height = 1920
-
-        self.create_template()
-
-        self.elements = []
-
-    def create_template(self):
-        self.svg_boilerplate = f"""
-            <svg width="{self.width}" height="{self.height}" xmlns="http://www.w3.org/2000/svg">
-              <%CODE%>
-            </svg>
-          """
-
-    def set_page_size(self,  width=1080, height=1920):
+class SVG_:
+    def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
+        self.elements = []
 
-        self.create_template()
+        self.svg_code = f"<svg width=\"{width}\" height=\"{
+            height}\" xmlns=\"http://www.w3.org/2000/svg\"><%CODE%></svg>"
 
-    def create(self, svg_output="output.svg"):
-        self.svg_output = svg_output
-        svg_code = self.svg_boilerplate.replace("<%CODE%>", " ".join(self.elements))
+    def set_background(self, background_color: str = "#ffffff"):
+        # Create background color
+        background = f"<rect x=\"0\" y=\"0\" width=\"{
+            self.width}\" height=\"{self.height}\" fill=\"{background_color}\" />"
+        self.elements.append(background)
 
-        with open(svg_output, "w") as file:
+    def create(self, output_file: str, output_dir: str = "svg-dir"):
+        svg_code = self.svg_code.replace("<%CODE%>", "".join(self.elements))
+        svg_file = f"{output_dir}/{output_file}"
+
+        with open(svg_file, "w") as file:
             file.write(svg_code)
 
         self.elements = []
 
-    def circle(self, xcor, ycor, radius, fill = "#000", stroke = "#000", **extras):
-        """
-        Create <circle /> and add it to list of elements.
+    def create_element(self, shape_: str, **kwargs):
+        if shape_ == "circle":
+            shape = "<circle "
+        elif shape_ == "rectangle":
+            shape = "<rect "
+        elif shape_ == "text":
+            shape = "<text <%PROPS%>><%TEXT%></text>"
+            props = ""
 
-        Arguments:
-          xcor   : x co-ordinate
-          ycor   : y co-ordinate
-          radius : Radius
-          fill   : Fill Color
-          stroke : Stroke Color
-          extras : Extra arguments "stoke_width (float)"
-        """
+            for prop, value in kwargs.items():
+                if prop == "text":
+                    continue
 
-        element = "<circle "
+                props += f"{prop}=\"{value}\" "
 
-        element += f"cx=\"{xcor}\" "
-        element += f"cy=\"{ycor}\" "
-        element += f"r=\"{radius}\" "
-        element += f"fill=\"{fill}\" "
-        element += f"stroke=\"{stroke}\" "
+            shape = shape.replace("<%PROPS%>", f"{props}")
+            shape = shape.replace("<%TEXT%>", kwargs["text"])
+            self.elements.append(shape)
 
-        for key, value in extras.items():
-          if element == "stroke_width":
-            element += f"{element.replace("_", "-")}=\"{value}\" "
+            return
 
-        element += "/> "
+        for prop, value in kwargs.items():
+            shape += f"{prop}=\"{value}\" "
 
-        self.elements.append(element)
+        shape += "/> "
 
-    def rectangle(self, xcor, ycor, width, height, rx=0, ry=0, fill = "#000", stroke = "#000", **extras):
-        """
-        Rectangle <rect /> and add it to list of elements.
-
-        Arguments:
-          xcor   : x co-ordinate (x)
-          ycor   : y co-ordinate (y)
-          width  : Width
-          height : Height
-          rx     : Corner Radius
-          ry     : Corner Radius
-          fill   : Fill Color
-          stroke : Stroke Color
-          extras : Extra arguments "stoke_width (float)"
-        """
-        element = "<rect "
-
-        element += f"x=\"{xcor}\" "
-        element += f"y=\"{ycor}\" "
-        element += f"width=\"{width}\" "
-        element += f"height=\"{height}\" "
-        element += f"rx=\"{rx}\" "
-        element += f"ry=\"{ry}\" "
-        element += f"fill=\"{fill}\" "
-        element += f"stroke=\"{stroke}\" "
-
-        for key, value in extras.items():
-          if element == "stroke_width":
-            element += f"{element.replace("_", "-")}=\"{value}\" "
-
-        element += "/> "
-
-        self.elements.append(element)
+        self.elements.append(shape)
