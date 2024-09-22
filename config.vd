@@ -9,21 +9,35 @@
 
 @@ 00:00:00 - 00:00:05
 
-= animation: top-to-bottom
-= speed: 4
 > item: shape
   + shape: circle
   + cx: 600
   + cy: 12
   + radius: 400
-
-@@ 00:00:06 - 00:00:10
-
-= animation: top-to-bottom
-= speed: 6
+  + animation: top-to-bottom
+  + speed: 2
 > item: shape
   + shape: rectangle
   + x: 600
   + y: 12
   + width: 400
   + height: 200
+  + animation: top-to-bottom
+  + speed: 2
+
+@@ 00:00:06 - 00:00:10
+
+> item: shape
+  + shape: rectangle
+  + x: 600
+  + y: 12
+  + width: 400
+  + height: 200
+  + animation: top-to-bottom
+  + speed: 6
+> item: shape
+  + shape: text
+  + x: 600
+  + y: 12
+  + text: SVVGB - SVG to Video
+  + speed: 4
