@@ -1,107 +1,113 @@
-from svg import SVG
-from convert import Convert
+from sys import exit, argv
+from parser import Parser
+from svg import SVG_
+from convert import image_to_video
 
-from rich.console import Console
-from rich.panel import Panel
-
-import json
-from sys import argv
-
+from shutil import rmtree
 import time
 import os
 
-from config import Config
+total_time: int = 0
+total_frames: int = 0
 
-term = Console()
-convert = Convert()
-svg = SVG()
-
-current_time = 0
-frame_count = 0
+config: dict = {}
+svg = None
 
 
-def calculate_frames(time_end, frame_rate=30):
-    global current_time
+def calculate_frames(end_time: int | float, frame_rate: int = 30) -> int:
+    global total_time
 
-    time_e_tuple = time.strptime(time_end, "%H:%M:%S")
+    time_tuple = time.strptime(end_time, "%H:%M:%S")
 
-    total_e_seconds = (
-        time_e_tuple.tm_sec + (time_e_tuple.tm_min * 60) + (time_e_tuple.tm_hour * 3600)
+    total_seconds = (
+        time_tuple.tm_sec + (time_tuple.tm_min * 60) +
+        (time_tuple.tm_hour * 3600)
     )
 
-    frames = (total_e_seconds - current_time) * frame_rate
+    frames = (total_seconds - total_time) * frame_rate
 
-    current_time += total_e_seconds
+    total_time += total_seconds
 
     return frames
 
 
-def create_svg(video_data, frames, animation_speed=2):
-    global frame_count
+def create_svg(time_slot: dict, frames: int) -> None:
+    global total_frames, svg
 
-    animation_speed = int(video_data["speed"])
+    items = time_slot["items"]
 
-    movement_multiplier = 1
+    movement = 1
 
-    shape_data = video_data["item"]
+    for frame in range(total_frames, total_frames + frames):
+        # Set background
+        svg.set_background()
 
-    shape = shape_data["shape"]
+        for item in items:
+            speed = item["speed"]
+            shape = item["shape"]
 
-    if not os.path.exists("svvgb_svg"):
-        os.mkdir("svvgb_svg")
+            if shape == "circle":
+                cx = item["cx"]
+                cy = item["cy"]
+                radius = item["radius"]
 
-    for i in range(frame_count, frame_count + frames):
-        if shape == "circle":
-            cx = shape_data["cx"]
-            cy = shape_data["cy"]
-            radius = shape_data["radius"]
+                svg.create_element("circle", cx=cx, cy=int(
+                    cy) * movement, r=radius, fill="#c17261", stroke="#fff")
 
-            svg.circle(cx, int(cy) * movement_multiplier, radius, "#c17261", "#fff")
-            movement_multiplier += animation_speed
-        elif shape == "rectangle":
-            x = shape_data["x"]
-            y = shape_data["y"]
-            width = shape_data["width"]
-            height = shape_data["height"]
+            elif shape == "rectangle":
+                x = item["x"]
+                y = item["y"]
+                width = item["width"]
+                height = item["height"]
 
-            svg.rectangle(x, int(y) + movement_multiplier, width, height, fill="#fff")
-            movement_multiplier += animation_speed
+                svg.create_element("rectangle", x=x, y=int(y) + movement, width=width,
+                                   height=height, fill="#fff", rx="0", ry="0", stroke="#000")
 
-        svg.create(svg_output=f"svvgb_svg/{i:04}.svg")
+            elif shape == "text":
+                x = item["x"]
+                y = item["y"]
+                text = item["text"]
 
-    frame_count += frames
+                svg.create_element("text", x=x, y=y, text=text, fill="#000")
+
+            movement += int(speed)
+
+        svg.create(output_file=f"{frame:06}.svg")
+
+        total_frames += frames
 
 
-def create_video():
-    convert.image_to_video(source_dir="svvgb_svg")
+def create_video() -> None:
+    image_to_video(output="svvgb")
 
 
-def main():
-    term.print(
-        Panel.fit("[bold green]SVVGB (SVG to Video Builder)[/bold green]"),
-        justify="center",
-    )
+def main() -> None:
+    global config, svg
 
-    config = Config().parse_config(argv[-1])
+    if len(argv) < 2:
+        exit(1)
 
-    term.print("🙂 Config file parsed successfully...\n")
+    file = argv[-1]
+    config = Parser().parse(file)
+
+    # Create svg folder to store svg
+    if not os.path.exists("svg-dir"):
+        os.mkdir("svg-dir")
 
     metadata = config["metadata"]
     timeline = config["timeline"]
 
-    page_width = metadata["width"]
-    page_height = metadata["height"]
+    width = metadata["width"]
+    height = metadata["height"]
 
-    svg.set_page_size(page_width, page_height)
+    svg = SVG_(width, height)
 
     for time_slot in timeline:
-        frames = calculate_frames(time_slot["time_end"])
+        frames = calculate_frames(time_slot["end"])
         create_svg(time_slot, frames)
 
-    with term.status("⚙️  Creating Video", spinner="arc"):
-        create_video()
-
-    term.print("🚀 Video has been created.")
+    create_video()
+    rmtree("svg-dir")
 
 
 if __name__ == "__main__":
