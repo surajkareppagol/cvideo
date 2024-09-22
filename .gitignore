@@ -5,4 +5,6 @@ __pycache__
 venv
 
 *.mkv
-svvgb_svg/
+svg-dir/
+
+config.json
