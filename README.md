@@ -30,7 +30,7 @@ python3 src/main.py [config-file]
 @ metadata
 
 = name: Circles and rectangles
-= background: #121212
+= background: #c17261
 = width: 1280
 = height: 720
 
@@ -38,18 +38,58 @@ python3 src/main.py [config-file]
 
 @@ 00:00:00 - 00:00:05
 
-= animation: top-to-bottom
 > item: shape
   + shape: circle
   + cx: 600
   + cy: 12
   + radius: 400
+  + speed: 2
+> item: shape
+  + shape: rectangle
+  + x: 600
+  + y: 12
+  + width: 400
+  + height: 200
+  + speed: 2
+
+@@ 00:00:06 - 00:00:10
+
+> item: shape
+  + shape: rectangle
+  + x: 600
+  + y: 12
+  + width: 400
+  + height: 200
+  + speed: 6
+> item: shape
+  + shape: text
+  + x: 600
+  + y: 12
+  + text: SVVGB - SVG to Video
+  + speed: 4
 ```
 
 - Format is divided into two sections `metadata` and `timeline`
 - This sections are preceded with `@` and time slots are preceded with `@@`.
 - Each of the attribute starts with `=` and it is in the above format.
 - Nested item starts with `>` with all the child items `+`.
+
+## ☰ Available shapes and options
+
+### Metadata
+
+- Name
+- Background color
+- Width
+- Height
+
+### Timeline
+
+- Shapes
+  - Circle
+  - Rectangle
+  - Text
+- speed (integer, default: 2)
 
 ## ✨ Features
 
