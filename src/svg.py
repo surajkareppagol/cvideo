@@ -1,51 +1,46 @@
-class SVG_:
+from os import path
+
+
+class SVG:
     def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
         self.elements = []
 
-        self.svg_code = f"<svg width=\"{width}\" height=\"{
-            height}\" xmlns=\"http://www.w3.org/2000/svg\"><%CODE%></svg>"
+        self.svg = """
+            <svg width="<%WIDTH%>" height="<%HEIGHT%>" xmlns="http://www.w3.org/2000/svg">
+            <%CODE%>
+            </svg>"""
 
-    def set_background(self, background_color: str = "#ffffff"):
-        # Create background color
-        background = f"<rect x=\"0\" y=\"0\" width=\"{
-            self.width}\" height=\"{self.height}\" fill=\"{background_color}\" />"
+    def background(self, bg_color="#fff"):
+        background = f"""
+            <rect x="0" y="0" width="<%WIDTH%>" height="<%HEIGHT%>" fill="{bg_color}" />"""
         self.elements.append(background)
 
-    def create(self, output_file: str, output_dir: str = "svg-dir"):
-        svg_code = self.svg_code.replace("<%CODE%>", "".join(self.elements))
-        svg_file = f"{output_dir}/{output_file}"
+    def create_element(self, item, **kwargs):
+        components = {"circle": "circle", "rectangle": "rect"}
 
-        with open(svg_file, "w") as file:
-            file.write(svg_code)
-
-        self.elements = []
-
-    def create_element(self, shape_: str, **kwargs):
-        if shape_ == "circle":
-            shape = "<circle "
-        elif shape_ == "rectangle":
-            shape = "<rect "
-        elif shape_ == "text":
-            shape = "<text <%PROPS%>><%TEXT%></text>"
-            props = ""
-
-            for prop, value in kwargs.items():
-                if prop == "text":
-                    continue
-
-                props += f"{prop}=\"{value}\" "
-
-            shape = shape.replace("<%PROPS%>", f"{props}")
-            shape = shape.replace("<%TEXT%>", kwargs["text"])
-            self.elements.append(shape)
-
+        if item in components.keys():
+            shape = f"<{components[item]} "
+        else:
             return
 
         for prop, value in kwargs.items():
-            shape += f"{prop}=\"{value}\" "
+            shape += f'{prop}="{value}" '
 
         shape += "/> "
 
         self.elements.append(shape)
+
+    def create_svg(self, svg_file, svg_dir="svg"):
+        svg = self.svg.replace("<%CODE%>", "".join(self.elements))
+
+        svg = svg.replace("<%WIDTH%>", self.width)
+        svg = svg.replace("<%HEIGHT%>", self.height)
+
+        file = path.join(svg_dir, svg_file)
+
+        with open(file, "w") as file:
+            file.write(svg)
+
+        self.elements.clear()
