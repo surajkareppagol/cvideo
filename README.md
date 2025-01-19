@@ -1,14 +1,13 @@
-# SVVGB
+# CVideo
 
-🎬 `SVVGB` is a video builder tool. It uses a configuration file to read the sequence of commands and creates a svg file.
-
-The `SVG` files are combined together via `ffmpeg-python` module.
+🎬 `CVideo` is a video builder tool. It uses a configuration file to read the
+sequence of commands and creates a video.
 
 ## ⚙️ Installation and usage
 
 ```bash
-git clone https://github.com/surajkareppagol/svvgb.git
-cd svvgb
+git clone https://github.com/surajkareppagol/cvideo.git
+cd cvideo
 ```
 
 ```bash
@@ -65,13 +64,12 @@ python3 src/main.py [config-file]
   + shape: text
   + x: 600
   + y: 12
-  + text: SVVGB - SVG to Video
+  + text: CVideo - Config to Video
   + speed: 4
 ```
 
 - Format is divided into two sections `metadata` and `timeline`
 - This sections are preceded with `@` and time slots are preceded with `@@`.
-- Each of the attribute starts with `=` and it is in the above format.
 - Nested item starts with `>` with all the child items `+`.
 
 ## ☰ Available shapes and options
